@@ -8,13 +8,14 @@
     },
     "files": [
         "main.ts",
-        "README.md"
+        "README.md",
+        "crc.ts"
     ],
     "testFiles": [
         "test.ts"
     ],
     "targetVersions": {
-        "target": "4.0.16",
+        "target": "4.0.17",
         "targetId": "microbit"
     },
     "supportedTargets": [
