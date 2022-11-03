@@ -26,10 +26,13 @@ function encodeSensors() {
 function transmitEverything() {
     let transtr = encodeSensors();
     serial.writeLine(transtr);
+    radio.sendString(transtr);
 }
 
 control.setInterval(function() {
     transmitEverything()
 }, 1000, control.IntervalMode.Interval)
-
+radio.onReceivedString(function(rS: string) {
+    serial.writeLine(rS)
+})
 //serial.writeLine((b_crc32("let's hope")).toString());
