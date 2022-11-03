@@ -19,7 +19,6 @@ function encodeSensors() {
     transtrin += "T:"+(input.temperature()-3.5)+";";
     transtrin += "L:"+input.lightLevel()+";"; 
     transtrin += "C:"+input.compassHeading()+";";
-    transtrin += "X:"+hash_string(transtrin);
     return transtrin;    
 }
 
@@ -32,6 +31,7 @@ function transmitEverything() {
 control.setInterval(function() {
     transmitEverything()
 }, 1000, control.IntervalMode.Interval)
+
 radio.onReceivedString(function(rS: string) {
     serial.writeLine(rS)
 })
