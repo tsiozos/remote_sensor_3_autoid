@@ -18,11 +18,11 @@ input.onButtonPressed(Button.A, function() {
 
 function encodeSensors() {
     let transtrin="+"+devID.toString();
-    transtrin += "t"+Math.floor(input.runningTime() / 1000);
-    transtrin += "T"+(input.temperature()-4);
-    transtrin += "L"+input.lightLevel(); 
-    transtrin += "C"+input.compassHeading();
-    transtrin += "M"+Math.trunc(input.magneticForce(Dimension.Strength));
+    transtrin += "r"+encode(Math.floor(input.runningTime() / 1000),16);
+    transtrin += "t"+encode((input.temperature()-4),16);
+    transtrin += "L"+encode(input.lightLevel(),16); 
+    //transtrin += "H"+encode(input.compassHeading(),16);
+    //transtrin += "M"+encode(Math.trunc(input.magneticForce(Dimension.Strength)),16);
     transtrin += "h"+hash_string(transtrin);
     return transtrin;    
 }
@@ -43,25 +43,29 @@ control.setInterval(function() {
 }, 5000, control.IntervalMode.Interval)
 
 radio.onReceivedString(function(rS: string) {
+    //return;
     serial.writeLine(rS);
-    let l = rS.split(";");
+    //let l = rS.split(";");
 
     //check if hash is ok
-    let hashstr = rS.slice(-3);
-    let checkstr = rS.slice(0,-3);
-    if (hashstr != hash_string(checkstr))
+    let hashstr = parseInt(rS.slice(-2),16);
+    let checkstr = rS.slice(0,-3); //cut out the "h" too
+    let encodedhash = parseInt(hash_string(checkstr),16);
+    if (hashstr != encodedhash) {
         serial.writeLine("ERROR at hash");
+        serial.writeLine(">> "+hashstr);
+        serial.writeLine(">>> "+encodedhash);
+    }
     else {
-        serial.writeLine("DATA RCV:");
-        for (let i=0; i<l.length; i++)
-            serial.writeLine("   "+i+":"+l[i]);
+        serial.writeLine("DATA RCV:"+rS);
+        
     }
 })
 
 // *************** TEST ***************
 serial.writeLine("**** START ****")
-serial.writeLine(hash_string("hello, there"));
-serial.writeLine(hash_string("hello ,there"));
+//serial.writeLine(hash_string("hello, there"));
+//serial.writeLine(hash_string("hello ,there"));
 
-for (let i=0; i< 20; i++)
-    serial.writeLine(encode(i,16));
+//for (let i=0; i< 20; i++)
+//    serial.writeLine(encode(i,16));
