@@ -1,5 +1,6 @@
 radio.setGroup(99);
 radio.setTransmitPower(7);
+radio.setTransmitSerialNumber(false);
 
 //device id is the serial number modulo 990 + 10
 //so range is actually 10 ~ 999
@@ -16,16 +17,20 @@ input.onButtonPressed(Button.A, function() {
 })
 
 function encodeSensors() {
-    let transtrin="+"+devID.toString()+";";
-    transtrin += Math.floor(input.runningTime() / 1000) + ";";
-    transtrin += "T"+(input.temperature()-4)+";";
-    transtrin += "L"+input.lightLevel()+";"; 
-    transtrin += "C"+input.compassHeading()+";";
-    transtrin += "M"+Math.trunc(input.magneticForce(Dimension.Strength))+";";
-    transtrin += hash_string(transtrin);
+    let transtrin="+"+devID.toString();
+    transtrin += "t"+Math.floor(input.runningTime() / 1000);
+    transtrin += "T"+(input.temperature()-4);
+    transtrin += "L"+input.lightLevel(); 
+    transtrin += "C"+input.compassHeading();
+    transtrin += "M"+Math.trunc(input.magneticForce(Dimension.Strength));
+    transtrin += "h"+hash_string(transtrin);
     return transtrin;    
 }
 
+/*
+ΤΟ ΜΕΓΙΣΤΟ ΜΗΚΟΣ ΜΕΤΑΔΟΣΗΣ string ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ 19.
+
+*/
 function transmitEverything() {
     let transtr = encodeSensors();
     serial.writeLine(transtr);
@@ -35,17 +40,28 @@ function transmitEverything() {
 
 control.setInterval(function() {
     transmitEverything()
-}, 15000, control.IntervalMode.Interval)
+}, 5000, control.IntervalMode.Interval)
 
 radio.onReceivedString(function(rS: string) {
     serial.writeLine(rS);
     let l = rS.split(";");
-    serial.writeLine("DATA RCV:");
-    for (let i=0; i<l.length; i++)
-        serial.writeLine(i+":"+l[i]);
+
+    //check if hash is ok
+    let hashstr = rS.slice(-3);
+    let checkstr = rS.slice(0,-3);
+    if (hashstr != hash_string(checkstr))
+        serial.writeLine("ERROR at hash");
+    else {
+        serial.writeLine("DATA RCV:");
+        for (let i=0; i<l.length; i++)
+            serial.writeLine("   "+i+":"+l[i]);
+    }
 })
 
 // *************** TEST ***************
 serial.writeLine("**** START ****")
 serial.writeLine(hash_string("hello, there"));
 serial.writeLine(hash_string("hello ,there"));
+
+for (let i=0; i< 20; i++)
+    serial.writeLine(encode(i,16));
