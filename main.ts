@@ -18,7 +18,7 @@ input.onButtonPressed(Button.A, function() {
 
 function encodeSensors() {
     let transtrin="+"+devID.toString();
-    transtrin += "r"+encode(Math.floor(input.runningTime() / 1000),16);
+    transtrin += "r"+Math.floor(input.runningTime() / 1000)%3600;
     transtrin += "t"+encode((input.temperature()-4),16);
     transtrin += "L"+encode(input.lightLevel(),16); 
     //transtrin += "H"+encode(input.compassHeading(),16);
