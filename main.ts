@@ -16,11 +16,13 @@ input.onButtonPressed(Button.A, function() {
 })
 
 function encodeSensors() {
-    let transtrin=devID.toString()+";";
-    transtrin += "T:"+(input.temperature()-4)+";";
-    transtrin += "L:"+input.lightLevel()+";"; 
-    transtrin += "C:"+input.compassHeading()+";";
-    transtrin += "M:"+Math.trunc(input.magneticForce(Dimension.Strength));
+    let transtrin="+"+devID.toString()+";";
+    transtrin += Math.floor(input.runningTime() / 1000) + ";";
+    transtrin += "T"+(input.temperature()-4)+";";
+    transtrin += "L"+input.lightLevel()+";"; 
+    transtrin += "C"+input.compassHeading()+";";
+    transtrin += "M"+Math.trunc(input.magneticForce(Dimension.Strength))+";";
+    transtrin += hash_string(transtrin);
     return transtrin;    
 }
 
@@ -33,9 +35,17 @@ function transmitEverything() {
 
 control.setInterval(function() {
     transmitEverything()
-}, 1000, control.IntervalMode.Interval)
+}, 15000, control.IntervalMode.Interval)
 
 radio.onReceivedString(function(rS: string) {
-    serial.writeLine(rS)
+    serial.writeLine(rS);
+    let l = rS.split(";");
+    serial.writeLine("DATA RCV:");
+    for (let i=0; i<l.length; i++)
+        serial.writeLine(i+":"+l[i]);
 })
-//serial.writeLine((b_crc32("let's hope")).toString());
+
+// *************** TEST ***************
+serial.writeLine("**** START ****")
+serial.writeLine(hash_string("hello, there"));
+serial.writeLine(hash_string("hello ,there"));
