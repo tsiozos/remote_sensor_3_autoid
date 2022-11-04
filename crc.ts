@@ -15,3 +15,17 @@ function hash_string(s: string) {
     
     return "00";
 }
+
+function check_hash(s: string): boolean {
+    let hashstr = parseInt(s.slice(-2), 16);
+    let checkstr = s.slice(0, -3); //cut out the "h" too
+    let encodedhash = parseInt(hash_string(checkstr), 16);
+    if (hashstr != encodedhash) {
+        serial.writeLine("ERROR at hash");
+        serial.writeLine(">> " + hashstr);
+        serial.writeLine(">>> " + encodedhash);
+        return false
+    }
+    //serial.writeLine("DATA RCV:" + rS);
+    return true;
+    }

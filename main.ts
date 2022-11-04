@@ -34,8 +34,10 @@ function encodeSensors() {
 function transmitEverything() {
     let transtr = encodeSensors();
     serial.writeLine(transtr);
-    for (let i=0;i<3;i++)
+    for (let i=0;i<3;i++) {
         radio.sendString(transtr);
+        basic.pause(randint(50,100));
+    }
 }
 
 control.setInterval(function() {
@@ -43,23 +45,9 @@ control.setInterval(function() {
 }, 5000, control.IntervalMode.Interval)
 
 radio.onReceivedString(function(rS: string) {
-    //return;
-    serial.writeLine(rS);
-    //let l = rS.split(";");
-
-    //check if hash is ok
-    let hashstr = parseInt(rS.slice(-2),16);
-    let checkstr = rS.slice(0,-3); //cut out the "h" too
-    let encodedhash = parseInt(hash_string(checkstr),16);
-    if (hashstr != encodedhash) {
-        serial.writeLine("ERROR at hash");
-        serial.writeLine(">> "+hashstr);
-        serial.writeLine(">>> "+encodedhash);
-    }
-    else {
-        serial.writeLine("DATA RCV:"+rS);
-        
-    }
+    if (check_hash(rS))
+        serial.writeLine("OK: "+rS);
+    
 })
 
 // *************** TEST ***************
