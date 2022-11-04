@@ -55,5 +55,5 @@ serial.writeLine("**** START ****")
 //serial.writeLine(hash_string("hello, there"));
 //serial.writeLine(hash_string("hello ,there"));
 
-//for (let i=0; i< 20; i++)
-//    serial.writeLine(encode(i,16));
+//for (let i=0; i< 300; i++)
+//    serial.writeLine(i+": "+encode(i,16));
