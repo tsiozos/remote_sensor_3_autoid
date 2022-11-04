@@ -7,6 +7,7 @@ let devID = Math.abs(control.deviceSerialNumber() % 990 + 10);
 
 serial.writeLine("my devID "+devID);
 basic.showString(devID.toString(),100);
+serial.writeLine("Sensors: "+encodeSensors())
 
 //Pressing A dumps data
 input.onButtonPressed(Button.A, function() {
@@ -16,16 +17,18 @@ input.onButtonPressed(Button.A, function() {
 
 function encodeSensors() {
     let transtrin=devID.toString()+";";
-    transtrin += "T:"+(input.temperature()-3.5)+";";
+    transtrin += "T:"+(input.temperature()-4)+";";
     transtrin += "L:"+input.lightLevel()+";"; 
     transtrin += "C:"+input.compassHeading()+";";
+    transtrin += "M:"+Math.trunc(input.magneticForce(Dimension.Strength));
     return transtrin;    
 }
 
 function transmitEverything() {
     let transtr = encodeSensors();
     serial.writeLine(transtr);
-    radio.sendString(transtr);
+    for (let i=0;i<3;i++)
+        radio.sendString(transtr);
 }
 
 control.setInterval(function() {
