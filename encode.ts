@@ -18,7 +18,11 @@ function encode(thenum: number, base: number): string {
 function decode(thestr: string, base: number): number {
     let res = 0;
     if (thestr.length > 0) {
-        
+        for (let i=0; i<thestr.length; i++) {
+            //serial.writeLine(">" + thestr[i] + " val=" + coder.indexOf(thestr[i]) + " pow=" + ((thestr.length - 1) - i).toString());
+            res += Math.pow(base,((thestr.length-1)-i))*coder.indexOf(thestr[i]);
+            //serial.writeLine("new res:"+res.toString());
+        }
     }
 
     return res;

@@ -18,7 +18,7 @@ input.onButtonPressed(Button.A, function() {
 
 function encodeSensors() {
     let transtrin="+"+devID.toString();
-    transtrin += "r"+Math.floor(input.runningTime() / 1000)%3600;
+    transtrin += "r"+encode(Math.floor(input.runningTime() / 1000)%86400,16);
     transtrin += "t"+encode((input.temperature()-4),16);
     transtrin += "L"+encode(input.lightLevel(),16); 
     //transtrin += "H"+encode(input.compassHeading(),16);
@@ -57,3 +57,6 @@ serial.writeLine("**** START ****")
 
 //for (let i=0; i< 300; i++)
 //    serial.writeLine(i+": "+encode(i,16));
+//let s1 = encode(1345892,16);
+//serial.writeLine("1345892 = 0x"+s1);
+//serial.writeLine("0x"+s1+" = "+decode(s1,16).toString());
