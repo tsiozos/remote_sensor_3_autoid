@@ -18,12 +18,12 @@ input.onButtonPressed(Button.A, function() {
 
 function encodeSensors() {
     let transtrin="+"+devID.toString();
-    transtrin += "r"+encode(Math.floor(input.runningTime() / 1000)%86400,16);
-    transtrin += "t"+encode((input.temperature()-4),16);
-    transtrin += "L"+encode(input.lightLevel(),16); 
-    //transtrin += "H"+encode(input.compassHeading(),16);
-    //transtrin += "M"+encode(Math.trunc(input.magneticForce(Dimension.Strength)),16);
-    transtrin += "h"+hash_string(transtrin);
+    transtrin += ">"+encode(Math.floor(input.runningTime() / 1000)%86400,62);
+    transtrin += "@"+encode((input.temperature()-4),62);
+    transtrin += "^"+encode(input.lightLevel(),62); 
+    //transtrin += "H"+encode(input.compassHeading(),62);
+    //transtrin += "M"+encode(Math.trunc(input.magneticForce(Dimension.Strength)),62);
+    transtrin += "*"+hash_string(transtrin);
     return transtrin;    
 }
 
@@ -57,6 +57,6 @@ serial.writeLine("**** START ****")
 
 //for (let i=0; i< 300; i++)
 //    serial.writeLine(i+": "+encode(i,16));
-//let s1 = encode(1345892,16);
-//serial.writeLine("1345892 = 0x"+s1);
-//serial.writeLine("0x"+s1+" = "+decode(s1,16).toString());
+let s1 = encode(999999999,62);
+serial.writeLine("999999999 = 62x "+s1);
+serial.writeLine("62x "+s1+" = "+decode(s1,62).toString());

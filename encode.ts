@@ -1,6 +1,6 @@
 // κωδικοποίηση αποκωδικοποίηση
-let coder = "0123456789ABCDEF";
-
+//let coder = "0123456789ABCDEF";
+let coder = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 // return an encoded string of thenum in base
 function encode(thenum: number, base: number): string {
     let finalstr = "0";
