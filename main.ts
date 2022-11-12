@@ -1,6 +1,8 @@
-radio.setGroup(99);
-radio.setTransmitPower(7);
-radio.setTransmitSerialNumber(false);
+
+//radio.setTransmitPower(0);
+radio.off();
+let radioStayOn = false;
+//radio.setTransmitSerialNumber(false);
 
 //device id is the serial number modulo 990 + 10
 //so range is actually 10 ~ 999
@@ -68,12 +70,16 @@ function decodeSensors(encoded: string, sens: Sensors): string {
 
 */
 function transmitEverything() {
+    if (!radioStayOn) radio.on();
+    radio.setTransmitPower(7);
+    radio.setGroup(99);
     let transtr = encodeSensors();
     serial.writeLine(transtr);
     for (let i=0;i<3;i++) {
         radio.sendString(transtr);
         basic.pause(randint(50,100));
     }
+    if (!radioStayOn) radio.off();
 }
 
 control.setInterval(function() {
@@ -82,8 +88,22 @@ control.setInterval(function() {
 
 radio.onReceivedString(function(rS: string) {
     if (check_hash(rS))
-        serial.writeLine("OK: "+rS);
+        serial.writeLine("OK: "+rS)
+    else
+        serial.writeLine("HASH ERROR on RCV str");
     
+})
+
+input.onButtonPressed(Button.B, function() {
+    radioStayOn = !radioStayOn;
+    if (radioStayOn) {
+        led.plot(2,2)
+        radio.on();
+    }
+    else {
+        led.unplot(2,2)
+        radio.off()
+    };
 })
 
 // *************** TEST ***************
