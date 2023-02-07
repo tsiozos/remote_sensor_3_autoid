@@ -61,6 +61,9 @@ function findFirstNotEqual(inputString: string, symb: string): string {
     return undefined;
 }
 
+// Εξάγει τις τιμές που ακολουθούν το κάθε separator.
+// Δεν δουλεύει σωστά γιατί από το 2ο και μετά επιστρέφει όλο το string μέχρι τέλους
+// ενώ θα έπρεπε να σταματάει στο επόμενο separator
 function extractValues(inputString: string) {
     let values: {[key:string]:string}={};
     let symbols = Sensors.ALL;
