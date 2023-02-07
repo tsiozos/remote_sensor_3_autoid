@@ -54,17 +54,19 @@ function extractValue(s: string, start: number): string {
     return sval;
 }
 
-interface SensorValues {
-    sensorsymbol: string;
-    sensorvalue: int16;
+function findFirstNotEqual(inputString: string, symb: string): string {
+    for (let c of inputString) {
+        if (c != symb) return c;
+    }
+    return undefined;
 }
 
 function extractValues(inputString: string) {
     let values: {[key:string]:string}={};
-    let symbols = ['#', '%', '@'];
+    let symbols = Sensors.ALL;
     for (let symbol of symbols) {
         if (inputString.includes(symbol)) {
-            let nextSymbol = symbols.find(s => s != symbol);
+            let nextSymbol = findFirstNotEqual(symbols, symbol);
             values[symbol] = inputString.split(symbol)[1].split(nextSymbol)[0];
         }
     }
@@ -73,14 +75,8 @@ function extractValues(inputString: string) {
 
 
 
-function decodeSensors(encoded: string, sens: Sensors): string {
-    let res = null;
-    if (Sensors.STATION === sens) {
-        if (encoded[0] == Sensors.STATION)
-            res = extractValue(encoded, 0);
-    } else if (Sensors.TIME === sens) {
-
-    }
+function decodeSensors(encoded: string, sens: Sensors) {
+    let res: {[key:string]:string} = extractValues(encoded);
     return res;
 }
 
@@ -106,8 +102,14 @@ control.setInterval(function() {
 }, 5000, control.IntervalMode.Interval)
 
 radio.onReceivedString(function(rS: string) {
-    if (check_hash(rS))
+    if (check_hash(rS)) {
         serial.writeLine("OK: "+rS)
+        serial.writeLine("Decoded:")
+        let sens = decodeSensors(rS, Sensors.ALL);
+        for (let key of Object.keys(sens))
+            serial.writeLine(key+"="+sens[key]);
+        //serial.writeLine(decodeSensors(rS,Sensors.ALL))
+    }
     else
         serial.writeLine("HASH ERROR on RCV str");
     
