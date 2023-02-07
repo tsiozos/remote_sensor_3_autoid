@@ -54,6 +54,25 @@ function extractValue(s: string, start: number): string {
     return sval;
 }
 
+interface SensorValues {
+    sensorsymbol: string;
+    sensorvalue: int16;
+}
+
+function extractValues(inputString: string) {
+    let values: {[key:string]:string}={};
+    let symbols = ['#', '%', '@'];
+    for (let symbol of symbols) {
+        if (inputString.includes(symbol)) {
+            let nextSymbol = symbols.find(s => s != symbol);
+            values[symbol] = inputString.split(symbol)[1].split(nextSymbol)[0];
+        }
+    }
+    return values;
+}
+
+
+
 function decodeSensors(encoded: string, sens: Sensors): string {
     let res = null;
     if (Sensors.STATION === sens) {
