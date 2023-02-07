@@ -28,6 +28,18 @@ class Sensors {
     static MAGNETIC = "%"
     static HASH = "*"
     static ALL = "+>@^&%*"
+    static toName(sensorSymbol: string): string {
+        switch(sensorSymbol) {
+            case Sensors.STATION: return "STATION";
+            case Sensors.TIME: return "TIME";
+            case Sensors.TEMP: return "TEMP";
+            case Sensors.LIGHT: return "LIGHT";
+            case Sensors.HEADING: return "HEADING";
+            case Sensors.MAGNETIC: return "MAGNTEIC";
+            case Sensors.HASH: return "HASH";
+            default: return "UNDEFINED";
+        }
+    }
 };
 
 class SensorData {
@@ -54,34 +66,30 @@ function extractValue(s: string, start: number): string {
     return sval;
 }
 
-function findFirstNotEqual(inputString: string, symb: string): string {
-    for (let c of inputString) {
-        if (c != symb) return c;
-    }
-    return undefined;
-}
-
-// Εξάγει τις τιμές που ακολουθούν το κάθε separator.
-// Δεν δουλεύει σωστά γιατί από το 2ο και μετά επιστρέφει όλο το string μέχρι τέλους
-// ενώ θα έπρεπε να σταματάει στο επόμενο separator
-function extractValues(inputString: string) {
+function extractValues2(inString: string) {
     let values: {[key:string]:string}={};
-    let symbols = Sensors.ALL;
-    for (let symbol of symbols) {
-        if (inputString.includes(symbol)) {
-            let nextSymbol = findFirstNotEqual(symbols, symbol);
-            values[symbol] = inputString.split(symbol)[1].split(nextSymbol)[0];
+    let separators: string = Sensors.ALL;
+
+    for (let onesep of separators) {
+        let idx = inString.indexOf(onesep)
+        if (idx != -1) {
+            let mykey = onesep
+            let myval = extractValue(inString, idx);
+            //idx++;
+            //while (inString.indexOf(inString[idx]) != -1) myval += inString[idx];
+            values[mykey]=myval;
         }
+
     }
     return values;
 }
 
 
 
-function decodeSensors(encoded: string, sens: Sensors) {
-    let res: {[key:string]:string} = extractValues(encoded);
-    return res;
-}
+// function decodeSensors(encoded: string, sens: Sensors) {
+//     let res: {[key:string]:string} = extractValues(encoded);
+//     return res;
+// }
 
 /*
 ΤΟ ΜΕΓΙΣΤΟ ΜΗΚΟΣ ΜΕΤΑΔΟΣΗΣ string ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ 19.
@@ -108,9 +116,13 @@ radio.onReceivedString(function(rS: string) {
     if (check_hash(rS)) {
         serial.writeLine("OK: "+rS)
         serial.writeLine("Decoded:")
-        let sens = decodeSensors(rS, Sensors.ALL);
+        let sens = extractValues2(rS);
         for (let key of Object.keys(sens))
-            serial.writeLine(key+"="+sens[key]);
+            if (key == Sensors.HASH || key == Sensors.STATION)
+                serial.writeLine(Sensors.toName(key)+"=" + sens[key]);
+            else
+                serial.writeLine(Sensors.toName(key) + "=" + decode(sens[key], 62))
+                
         //serial.writeLine(decodeSensors(rS,Sensors.ALL))
     }
     else
